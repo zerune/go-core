@@ -5,10 +5,11 @@ package stream
 
 import (
 	"fmt"
-	"github.com/todocoder/go-stream/collectors"
 	"runtime"
 	"sort"
 	"sync"
+
+	"github.com/todocoder/go-stream/collectors"
 )
 
 type (
@@ -363,7 +364,7 @@ func (s Stream[T]) FlatMap(mapper func(T) Stream[any]) Stream[any] {
 	return FlatMap[T](s, mapper)
 }
 
-func (s Stream[T]) FlatMapToInt(mapper func(T) Stream[any]) Stream[any] {
+func (s Stream[T]) FlatMapToInt(mapper func(T) Stream[int64]) Stream[int64] {
 	return FlatMap[T](s, mapper)
 }
 func (s Stream[T]) FlatMapToDouble(mapper func(T) Stream[float64]) Stream[float64] {

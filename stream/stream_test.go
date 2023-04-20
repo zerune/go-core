@@ -2,9 +2,10 @@ package stream
 
 import (
 	"fmt"
-	"github.com/todocoder/go-stream/collectors"
 	"strings"
 	"testing"
+
+	"github.com/todocoder/go-stream/collectors"
 )
 
 type TestItem struct {
@@ -417,6 +418,25 @@ func TestFlatMap(t *testing.T) {
 			itemValue: ite.itemValue,
 		}
 	}).Collect(collectors.ToSlice[any]())
+	fmt.Println(res)
+}
+
+func TestFlatMapToInt(t *testing.T) {
+	res := Of(
+		TestItem{itemNum: 1, itemValue: "item1"},
+		TestItem{itemNum: 2, itemValue: "item2"},
+		TestItem{itemNum: 3, itemValue: "item3"},
+	).Filter(func(item TestItem) bool {
+		if item.itemNum != 1 {
+			return true
+		}
+		return false
+	}).FlatMapToInt(func(item TestItem) Stream[int64] {
+		return Of[int64](
+			int64(item.itemNum*10),
+			int64(item.itemNum*20),
+		)
+	}).Collect(collectors.ToSlice[int64]())
 	fmt.Println(res)
 }
 
