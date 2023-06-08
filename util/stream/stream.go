@@ -457,14 +457,14 @@ func (s *streamImpl[T]) Collect(collector collectors.Collector[T, any, any]) any
 func (s *streamImpl[T]) walk(fn walkFunc[T]) Stream[T] {
 	option := buildOptions(s.isParallel)
 	if option.unlimitedWorkers {
-		wg := routine.NewRoutineGroup()
+		wg := threading.NewRoutineGroup()
 		return s.walkFunc(wg, fn, option)
 	}
-	wg := routine.NewLimitedGroup(option.workers)
+	wg := threading.NewLimitedGroup(option.workers)
 	return s.walkFunc(wg, fn, option)
 }
 
-func (s *streamImpl[T]) walkFunc(wg routine.WaitGroup, fn walkFunc[T], option rxOptions) Stream[T] {
+func (s *streamImpl[T]) walkFunc(wg threading.WaitGroup, fn walkFunc[T], option rxOptions) Stream[T] {
 	pipe := make(chan T, option.workers)
 
 	go func() {
@@ -496,7 +496,7 @@ func OfParallel[T any](values ...T) Stream[T] {
 
 func OfFrom[T any](generate func(source chan<- T)) Stream[T] {
 	source := make(chan T)
-	routine.GoSafe(func() {
+	threading.GoSafe(func() {
 		defer close(source)
 		generate(source)
 	})
@@ -505,7 +505,7 @@ func OfFrom[T any](generate func(source chan<- T)) Stream[T] {
 
 func OfFromParallel[T any](generate func(source chan<- T)) Stream[T] {
 	source := make(chan T)
-	routine.GoSafe(func() {
+	threading.GoSafe(func() {
 		defer close(source)
 		generate(source)
 	})
