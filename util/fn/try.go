@@ -24,7 +24,7 @@ import (
 
 // Try
 // see: https://www.cnblogs.com/beiluowuzheng/p/10263724.html
-func Try(f func() error) Catch {
+func Try(f func()) Catch {
 	c := &catch{}
 	defer func() {
 		defer func() {
@@ -36,9 +36,7 @@ func Try(f func() error) Catch {
 				}
 			}
 		}()
-		if err := f(); err != nil {
-			c.err = err
-		}
+		f()
 	}()
 	return c
 }
@@ -58,7 +56,8 @@ type catch struct {
 	caught bool
 }
 
-func (c *catch) required() bool {
+// requireCatch函数有两个作用：一个是判断是否已捕捉异常，另一个是否发生了异常。如果返回false则代表没有异常，或异常已被捕捉
+func (c *catch) requireCatch() bool {
 	if c.caught || c.err == nil {
 		return false
 	}
@@ -66,7 +65,7 @@ func (c *catch) required() bool {
 }
 
 func (c *catch) Catch(err error, handler func(error)) Catch {
-	if !c.required() {
+	if !c.requireCatch() {
 		return c
 	}
 	// 如果传入的error类型和发生异常的类型一致，则执行异常处理器，并将caught修改为true代表已捕捉异常
@@ -77,8 +76,9 @@ func (c *catch) Catch(err error, handler func(error)) Catch {
 	return c
 }
 
+// CatchAll CatchAll()函数和Catch()函数都是返回同一个对象，但返回的接口类型却不一样，也就是CatchAll()之后只能调用Finally()
 func (c *catch) CatchAll(handler func(error)) Finally {
-	if !c.required() {
+	if !c.requireCatch() {
 		return c
 	}
 	handler(c.err)

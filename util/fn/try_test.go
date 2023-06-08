@@ -25,7 +25,7 @@ import (
 )
 
 func TestTry(t *testing.T) {
-	Try(func() error {
+	Try(func() {
 		n := rand.Intn(9)
 		fmt.Println(n)
 		if n > 5 {
@@ -33,9 +33,9 @@ func TestTry(t *testing.T) {
 		}
 		r := n%2 == 0
 		if r {
-			return errors.NewUnsupportedOperationError("UnsupportedOperationError")
+			panic(errors.NewUnsupportedOperationError("UnsupportedOperationError"))
 		}
-		return errors.NewIllegalArgumentError("IllegalArgumentError")
+		panic(errors.NewIllegalArgumentError("IllegalArgumentError"))
 	}).Catch(new(errors.IllegalArgumentError), func(err error) {
 		fmt.Println("Catch IllegalArgumentError")
 	}).Catch(new(errors.UnsupportedOperationError), func(err error) {
