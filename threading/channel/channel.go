@@ -19,5 +19,6 @@ package channel
 // Drain drains the given channel.
 func Drain[T any](channel <-chan T) {
 	for range channel {
+		// Empty
 	}
 }

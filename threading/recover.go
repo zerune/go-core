@@ -18,7 +18,7 @@
  * See: zeromicro/go-zero/core/rescue/recover.go
  */
 
-package routine
+package threading
 
 import "log"
 

@@ -2,7 +2,7 @@
  * See: zeromicro/go-zero/core/threading/routines.go
  */
 
-package routine
+package threading
 
 import (
 	"bytes"

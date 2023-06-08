@@ -2,7 +2,7 @@
  * See: zeromicro/go-zero/core/threading/routinegroup.go
  */
 
-package routine
+package threading
 
 import (
 	"sync"

@@ -2,7 +2,7 @@
  * See: zeromicro/go-zero/core/threading/workergroup.go
  */
 
-package routine
+package threading
 
 // A WorkerGroup is used to run given number of workers to process jobs.
 type WorkerGroup struct {

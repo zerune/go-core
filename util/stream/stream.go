@@ -5,8 +5,8 @@ import (
 	"sort"
 
 	"github.com/zerune/go-core/lang"
-	"github.com/zerune/go-core/routine"
-	"github.com/zerune/go-core/routine/channel"
+	"github.com/zerune/go-core/threading"
+	"github.com/zerune/go-core/threading/channel"
 	"github.com/zerune/go-core/util/function"
 	"github.com/zerune/go-core/util/optional"
 	"github.com/zerune/go-core/util/stream/collectors"
@@ -70,7 +70,7 @@ func (s *streamImpl[T]) Concat(others ...Stream[T]) Stream[T] {
 	source := make(chan T)
 	go func() {
 		if s.isParallel {
-			group := routine.NewRoutineGroup()
+			group := threading.NewRoutineGroup()
 			group.Run(
 				func() {
 					for item := range s.source {
@@ -167,7 +167,7 @@ func (s *streamImpl[T]) Skip(n int64) Stream[T] {
 
 func (s *streamImpl[T]) Distinct(opts ...function.Function[T, any]) Stream[T] {
 	source := make(chan T)
-	routine.GoSafe(func() {
+	threading.GoSafe(func() {
 		defer close(source)
 
 		keys := make(map[any]lang.PlaceholderType)
@@ -262,7 +262,7 @@ func (s *streamImpl[T]) Min(comparator function.Comparator[T]) optional.Optional
 
 func (s *streamImpl[T]) ForEach(action function.Consumer[T]) {
 	option := buildOptions(s.isParallel)
-	wg := routine.NewLimitedGroup(option.workers)
+	wg := threading.NewLimitedGroup(option.workers)
 	for item := range s.source {
 		// important, used in another goroutine
 		val := item
@@ -279,7 +279,7 @@ func (s *streamImpl[T]) ForEach(action function.Consumer[T]) {
 func (s *streamImpl[T]) AllMatch(predicate function.Predicate[T]) bool {
 	// 非缓冲通道
 	flag := make(chan bool)
-	routine.GoSafe(func() {
+	threading.GoSafe(func() {
 		tempFlag := true
 		for item := range s.source {
 			if !predicate(item) {
@@ -296,7 +296,7 @@ func (s *streamImpl[T]) AllMatch(predicate function.Predicate[T]) bool {
 // AnyMatch 返回此流中是否存在元素满足所提供的条件
 func (s *streamImpl[T]) AnyMatch(predicate function.Predicate[T]) bool {
 	flag := make(chan bool)
-	routine.GoSafe(func() {
+	threading.GoSafe(func() {
 		tempFlag := false
 		for item := range s.source {
 			if predicate(item) {
@@ -314,7 +314,7 @@ func (s *streamImpl[T]) AnyMatch(predicate function.Predicate[T]) bool {
 // NoneMatch 返回此流中是否全都不满足条件
 func (s *streamImpl[T]) NoneMatch(predicate function.Predicate[T]) bool {
 	flag := make(chan bool)
-	routine.GoSafe(func() {
+	threading.GoSafe(func() {
 		tempFlag := true
 		for item := range s.source {
 			if predicate(item) {
